@@ -1,0 +1,4 @@
+node_modules/
+*.log
+.impeccable/hook.cache.json
+.impeccable/questions/

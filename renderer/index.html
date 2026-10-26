@@ -1,0 +1,139 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self'; style-src 'self'; font-src 'self'; img-src 'self' data:">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Claude Launcher</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <svg class="defs" aria-hidden="true" focusable="false">
+    <symbol id="i-sparkle" viewBox="-10 -10 20 20">
+      <path d="M0 -10 C1.6 -2.4 2.4 -1.6 10 0 C2.4 1.6 1.6 2.4 0 10 C-1.6 2.4 -2.4 1.6 -10 0 C-2.4 -1.6 -1.6 -2.4 0 -10 Z"/>
+    </symbol>
+    <symbol id="i-refresh" viewBox="0 0 24 24">
+      <path d="M20 11a8 8 0 1 0-2.3 5.7" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+      <path d="M20 4v7h-7" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+    </symbol>
+    <symbol id="i-sliders" viewBox="0 0 24 24">
+      <path d="M4 7h9M19 7h1M4 17h3M13 17h7" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+      <circle cx="16" cy="7" r="2.6" fill="none" stroke="currentColor" stroke-width="2"/>
+      <circle cx="10" cy="17" r="2.6" fill="none" stroke="currentColor" stroke-width="2"/>
+    </symbol>
+    <symbol id="i-plus" viewBox="0 0 24 24">
+      <path d="M12 5v14M5 12h14" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/>
+    </symbol>
+  </svg>
+
+  <header class="top">
+    <img class="logo" src="icon.svg" alt="" width="44" height="44">
+    <div class="top-text">
+      <h1>Claude Launcher</h1>
+      <p class="sub" id="summary">Loading…</p>
+    </div>
+    <div class="top-actions">
+      <button type="button" class="icon-btn" id="refresh" title="Refresh now" aria-label="Refresh now">
+        <svg aria-hidden="true"><use href="#i-refresh"/></svg>
+      </button>
+      <button type="button" class="icon-btn" id="open-settings" title="Settings" aria-label="Settings">
+        <svg aria-hidden="true"><use href="#i-sliders"/></svg>
+      </button>
+      <button type="button" class="primary" id="add">
+        <svg aria-hidden="true"><use href="#i-plus"/></svg>
+        Add profile
+      </button>
+    </div>
+  </header>
+
+  <div class="banner" id="banner" role="alert" hidden></div>
+
+  <main id="profiles" aria-live="polite"></main>
+
+  <footer class="note">
+    Usage comes from Claude Desktop's own files on this computer, so it only updates while a profile is open.
+    Use one profile per account you own. Accounts must not be shared.
+  </footer>
+
+  <dialog id="name-dialog">
+    <form method="dialog" id="name-form">
+      <h2 id="name-title">Add profile</h2>
+      <label for="name-input">Name</label>
+      <input id="name-input" maxlength="60" autocomplete="off" required>
+      <p class="hint" id="name-hint"></p>
+      <p class="error" id="name-error" hidden></p>
+      <div class="dialog-actions">
+        <button type="button" class="ghost" id="name-cancel">Cancel</button>
+        <button type="submit" class="primary" id="name-ok">Add</button>
+      </div>
+    </form>
+  </dialog>
+
+  <dialog id="settings-dialog" aria-labelledby="settings-title">
+    <form method="dialog" id="settings-form" class="settings">
+      <h2 id="settings-title">Settings</h2>
+
+      <fieldset>
+        <legend>Background</legend>
+        <label class="toggle">
+          <span class="toggle-text">
+            <span>Keep running in the tray when closed</span>
+            <small>Closing the window hides it. Quit from the tray menu.</small>
+          </span>
+          <input type="checkbox" role="switch" name="closeToTray">
+        </label>
+        <label class="toggle">
+          <span class="toggle-text">
+            <span>Start in the tray</span>
+            <small>Open without showing this window.</small>
+          </span>
+          <input type="checkbox" role="switch" name="startHidden">
+        </label>
+        <label class="toggle">
+          <span class="toggle-text">
+            <span>Start at login</span>
+            <small>Starts in the tray when you sign in to your desktop.</small>
+          </span>
+          <input type="checkbox" role="switch" name="openAtLogin">
+        </label>
+        <label class="toggle">
+          <span class="toggle-text">
+            <span>Check profiles every</span>
+            <small>Re-reads the usage each Claude Desktop profile has saved.</small>
+          </span>
+          <select name="refreshMinutes">
+            <option value="1">1 minute</option>
+            <option value="5">5 minutes</option>
+            <option value="15">15 minutes</option>
+          </select>
+        </label>
+      </fieldset>
+
+      <fieldset>
+        <legend>Notifications</legend>
+        <label class="toggle">
+          <span class="toggle-text">
+            <span>At 80% and 95% of a 5-hour window</span>
+          </span>
+          <input type="checkbox" role="switch" name="notifyUsage">
+        </label>
+        <label class="toggle">
+          <span class="toggle-text">
+            <span>When a nearly full 5-hour window resets</span>
+            <small>Reset times are estimated from the saved usage.</small>
+          </span>
+          <input type="checkbox" role="switch" name="notifyReset">
+        </label>
+      </fieldset>
+
+      <p class="hint">A closed profile's usage only changes after you open it again: the launcher reads what Claude Desktop saved and never signs in itself.</p>
+      <p class="error" id="settings-error" hidden></p>
+      <div class="dialog-actions">
+        <button type="submit" class="primary">Done</button>
+      </div>
+    </form>
+  </dialog>
+
+  <script src="app.js"></script>
+</body>
+</html>
